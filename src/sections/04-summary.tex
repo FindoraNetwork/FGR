@@ -12,6 +12,6 @@ Finally, organize all necessary tasks into a list:
     \item define a `PUB ACCOUNT' with its `XfrKeyPair' known to all
     \item restore the genesis data from tendermint when creating new `Ledger'
     \item add some special logics to check transactions related to the `PUB ACCOUNT'
-    \item for each block, ensure that there is at most one transaction of transfering from the `PUB ACCOUNT'
-    \item add necessary codes in the `tendermint' to support the logic mentioned above, as described in this article
+    \item for each block, at most one transaction can do transfer from the `PUB ACCOUNT' to outside
+    \item add necessary codes in the `tendermint' to support the logic mentioned above
 \end{ENUMERATE}
