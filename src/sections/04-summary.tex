@@ -9,9 +9,10 @@ Finally, organize all necessary tasks into a list:
 ~\par
 
 \begin{ENUMERATE}
-    \item define a `PUB ACCOUNT' with its `XfrKeyPair' known to all
-    \item restore the genesis data from tendermint when creating new `Ledger'
-    \item add some special logics to check transactions related to the `PUB ACCOUNT'
-    \item for each block, at most one transaction can do transfer from the `PUB ACCOUNT' to outside
-    \item add necessary codes in the `tendermint' to support the logic mentioned above
+\item define a \LSTINLINE{PUB ACCOUNT} with its \LSTINLINE{XfrKeyPair} known to all
+    \item restore the genesis data from tendermint when creating new \LSTINLINE{Ledger}
+    \item add some special logics to check transactions related to the \LSTINLINE{PUB ACCOUNT}
+    \item for each block, at most one transaction can do transfer from the \LSTINLINE{PUB ACCOUNT} to outside
+    \item create a customed \LSTINLINE{txn_builder} static library for \LSTINLINE{golang ffi}
+    \item add necessary codes in the \LSTINLINE{Tendermint} to support the logic mentioned above
 \end{ENUMERATE}
