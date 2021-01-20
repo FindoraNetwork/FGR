@@ -1,0 +1,3 @@
+# FGR
+
+Fee & Gensis & Reward
