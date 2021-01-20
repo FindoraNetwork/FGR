@@ -1,38 +1,33 @@
 %%%%%%%%%%%%%%%%%%%%%%%
-\section{Block Reward}
+\section{Block Reward} \label{section:reward}
 %%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Logic Diagram}
+\subsection{Overview}
 
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
+~\par
 
-\subsection{Workload in Findora Code}
+All \LSTINLINE{Block Rewards} finally come from FGA.
 
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
+There can only be one transaction transferred from FGA in each block,
+and the amount cannot exceed the officially defined block reward,
+and its destination must be FFA.
 
-\subsection{Workload in Tendermint Code}
+\clearpage
+
+\subsection{Jobs in Findora}
+
+~\par
+
+Ensure that the following rules are all effective:
+
+\begin{itemize}
+    \item FGA can only transfer funds to FFA
+    \item FGA can only transfer outward once per block
+    \item Each transfer amount of FGA must not be higher than the officially defined block reward
+    \item A single bad validator cannot reach a consensus on the whole network
+\end{itemize}
+
+\subsection{Jobs in Tenderimint}
 
 ~\par
 
@@ -65,11 +60,12 @@ we can go a step further and add a special rule to it, as follows:
         // txs = findora.AppendFeeTx(txs)
         // ```
         //
-        // Now, suppose our block reward is 10 FRA, consider the following rules:
+        // Now, suppose our block reward is 10 token, consider the following rules:
         //
-        // - allow the output in this transaction to be 10 FRA more than the input
-        // - the input address must be the address of `PUB ACCOUNT`
-        // - transfer from the `PUB ACCOUNT` is only allowed once in each block
+        // - transfer 10 token from FGA to FFA
+        // - transfer all transactions in FFA to validator
+        // - the input address must be the address of `FFA`
+        // - transfer from `FGA` and `FFA` is only allowed once in each block
         //     - prevent verifiers from doing bad things
         //     - ensure this in the ABCI's `DeliverTx()` based on our APP logic
         //

@@ -1,40 +1,71 @@
+\clearpage
+
 %%%%%%%%%%%%%%%%%%%%%%%
 \section{Genesis State}
 %%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Logic Diagram}
+\subsection{Overview}
 
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
+~\par
 
-\subsection{Workload in Findora Code}
+Whether it is by adding \LSTINLINE{AppState}\footnote{and then sending the transaction accordingly in the APP}
+in \LSTINLINE{genesis.json},
+Or the way of sending transactions directly on the client side, there is no absolute guarantee that all the preset
+transactions will be packaged into the genesis block\footnote{Tendermint's genesis block height is 1}.
+The reason is that all transactions sent from outside Tendermint need to go through its \LSTINLINE{MemPool},
+There are many uncertainties when the transactions in \LSTINLINE{MemPool} are packaged.
 
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
+If you can add these preset transactions after \LSTINLINE{MemPool}, you can get a definite result,
+that is, all preset transactions will appear in the genesis block.
 
-\subsection{Workload in Tenderimint Code}
+The transaction process in the genesis block is as follows:
+
+\begin{ENUMERATE}
+    \item Create an FRA asset type with a fixed address\footnote {this address is similar to FFA and is also fully public}.
+            This address will be referred to as FGA (Findora Genesis Address) in the following content
+    \item Issue a large number of tokens, such as the maximum value of u64.
+    \item Create a transaction and transfer the pre-sold amount of tokens to FFA.
+    \item Create a transaction, send the corresponding amount of tokens from FFA to each user's address.
+    \item These transactions will be obtained by the APP through the regular
+            \LSTINLINE{DeliverTx} callback, so no additional data synchronization operations are required.
+\end{ENUMERATE}
+
+\subsection{Safety Analysis}
+
+\begin{ENUMERATE}
+    \item Why issue such a large number of tokens?
+    \begin{ITEMIZE}
+        \item It can be issued on demand.
+        \item The currency issuance strategy here is an alternative.
+    \end{ITEMIZE}
+    \item Why does FGA need to be fully disclosed?
+    \begin{ITEMIZE}
+        \item If the private key is kept secret, it will bring a crisis of public trust.
+        \item System will ensure that this address is used correctly through a consensus mechanism.
+    \end{ITEMIZE}
+    \item Why do I need to use FFA when transferring money to users?
+    \begin{ITEMIZE}
+        \item FGA will be restricted to only allow transfers to FFA in the logic of the APP layer.
+        \item This attribute will be used by the logic related to block rewards in the \ref{section:reward} chapter.
+    \end{ITEMIZE}
+\end{ENUMERATE}
+
+\subsection{Jobs in Findora}
+
+~\par
+
+None.
+
+\clearpage
+
+\subsection{Jobs in Tenderimint}
+
+~\par
+
+When the block height is 1, it means that it is in the process of publishing the genesis block.
+
+Similar to the previous section, the \LSTINLINE{golang package} named \LSTINLINE{findora} is also required,
+The function of \LSTINLINE{txn_builder} is internally encapsulated and used to generate all genesis transactions.
 
 \begin{lstlisting}[language=go]
     /**

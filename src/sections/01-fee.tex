@@ -1,46 +1,90 @@
+\clearpage
+
 %%%%%%%%%%%%%%%%%%%%%%%
 \section{Transaction Fee}
 %%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Logic Diagram}
+\subsection{Overview}
 
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
+~\par
 
-\subsection{Workload in Findora Code}
+When the client generates a transaction, the receiving account of the transaction fee
+is a fixed address, which is completely public, including its private key.
+Therefore, the client does not need a special method to set transaction fees,
+and all fees transferred to this address are regarded as transaction fees.
 
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
-. \\
+In the following content, FFA (Findora Fee Address) will be used to represent this address.
 
-\subsection{Workload in Tenderimint Code} \label{tendermint:CreateProposalBlock}
+When the Validator generates a block, it can transfer all assets
+under the FFA to its own account based on the FFA's private key as the block's revenue, usually FRA tokens.
+
+The calculation rule of transaction fee is another issue that needs to be considered,
+such as charging according to the total number of bytes of the transaction itself, etc.
+This will be implemented as a method of \LSTINLINE{Transaction} in the code,
+which will be referred to in the form of \LSTINLINE{tx.calculate_fee()} later.
+
+The transaction fee collection logic will be implemented in this way.
+
+\subsection{Safety Analysis}
+
+\begin{enumerate}
+    \item In a fully public FFA account, anyone can construct a legal transaction signature.
+            How to ensure that the tokens are only obtained by the Validator?
+        \begin{itemize}
+            \item Analyzing from the economic model, Validator will certainly not allow the theft of its assets.
+            \item The block is packaged by the Validator. In the process of packaging,
+                    all records of transfers from the FFA account that are not issued by itself will be filtered out.
+            \item The logic of this part will be implemented by changing the code of Tendermint.
+        \end{itemize}
+    \item Does Validator have a chance to create double-spending phenomenon?
+        \begin{itemize}
+            \item This needs to be controlled by the business logic of the APP, such as Nonce, etc.
+            \item The transaction fee mechanism itself does not introduce additional double spending.
+        \end{itemize}
+\end{enumerate}
+
+\subsection{Jobs in Findora}
+
+\begin{itemize}
+    \item Provide a function to the client to calculate transaction fees
+            during the transaction construction phase.
+    \item Ensure that at least one \LSTINLINE{Operation} of type \LSTINLINE{TransferAsset}
+            exists in each transaction, and the token type of operation is FRA.
+    \item According to the result of \LSTINLINE{tx.calculate_fee()}
+            to calculate whether the minimum transaction fee is met.
+\end{itemize}
+
+\begin{lstlisting}
+    pub struct Transaction {
+        pub body: TransactionBody,
+        ...
+    }
+
+    pub struct TransactionBody {
+        // Some `Operation`s in the `TransferAsset` type must exist,
+        // and the destination of their FRAs must be the `FFA`.
+        pub operations: Vec<Operation>,
+        ...
+    }
+
+    pub enum Operation {
+        TransferAsset(TransferAsset),
+        ...
+    }
+\end{lstlisting}
+
+\subsection{Jobs in Tenderimint} \label{tendermint:CreateProposalBlock}
+
+~\par
+
+Create a \LSTINLINE{golang package} similar to \LSTINLINE{github.com/FindoraNetwork/findora},
+The internal package \LSTINLINE{txn_builder}\footnote{ compiles Rust code into a static library,
+and Go calls the function through FFI},
+It is used to create a transaction for charging transaction fees
+when \LSTINLINE{Tendermint} generates a block.
+
+The comment section in the following code segment describes the logic
+that will be added to \LSTINLINE{Tendermint}:
 
 \begin{lstlisting}[language=go]
     /**
@@ -63,7 +107,7 @@
         // Right here!
         //
         // Filter out transactions that want to steal fees,
-        // drop all txs with any input from the `PUB ACCOUNT`.
+        // drop all txs with any input from the `FFA`.
         //
         // Should this be implemented in the ABCI's `CheckTx(...)`?
         //
@@ -73,7 +117,7 @@
         //
         // After all txs from the mempool have been handled correctly,
         // the validator can create a new tx which will transfer all fees
-        // from the `PUB ACCOUNT` to its own, and append it to txs.
+        // from the `FFA` to its own, and append it to txs.
         //
         // ```
         // txs = findora.AppendFeeTx(txs)
