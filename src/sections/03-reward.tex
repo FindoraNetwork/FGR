@@ -1,3 +1,58 @@
 %%%%%%%%%%%%%%%%%%%%%%%
 \section{Block Reward}
 %%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Logic Diagram}
+
+\subsection{Workload in Findora Code}
+
+\subsection{Workload in Tendermint Code}
+
+Recalling the \LSTINLINE{CreateProposalBlock()} function in Tendermint that we mentioned in \ref{tendermint:CreateProposalBlock},
+we can go a step further and add a special rule to it, as follows:
+
+\begin{lstlisting}[language=go]
+    /**
+     * tendermint(v0.33.5)/state/execution.go#92
+     */
+    func (blockExec *BlockExecutor) CreateProposalBlock(
+        height int64,
+        state State, commit *types.Commit,
+        proposerAddr []byte,
+    ) (*types.Block, *types.PartSet) {
+        maxBytes := state.ConsensusParams.Block.MaxBytes
+        maxGas := state.ConsensusParams.Block.MaxGas
+
+        maxNumEvidence, _ := types.MaxEvidencePerBlock(maxBytes)
+        evidence := blockExec.evpool.PendingEvidence(maxNumEvidence)
+
+        maxDataBytes := types.MaxDataBytes(maxBytes, state.Validators.Size(), len(evidence))
+        txs := blockExec.mempool.ReapMaxBytesMaxGas(maxDataBytes, maxGas)
+
+        // Right here!
+        //
+        // Below is the form of `AppendFeeTx()`' in the 'Transaction Fee' section:
+        //
+        // ```
+        // txs = findora.AppendFeeTx(txs)
+        // ```
+        //
+        // Now, suppose our block reward is 10 FRA, consider the following rules:
+        //
+        // - allow the output in this transaction to be 10 FRA more than the input
+        // - the input address must be the address of `PUB_ACCOUNT`
+        // - transfer from the `PUB_ACCOUNT` is only allowed once in each block
+        //     - prevent verifiers from doing bad things
+        //     - ensure this in the ABCI's `DeliverTx()` based on our APP logic
+        //
+        // That's it!
+        // The `transaction fee` and `block rewards` will be done at the same time.
+        // Finally, we rename the original `AppendFeeTx()` to `AppendFeeAndRewards()`:
+        //
+        // ```
+        // txs = findora.AppendFeeAndRewards(txs)
+        // ```
+
+        return state.MakeBlock(height, txs, commit, evidence, proposerAddr)
+    }
+\end{lstlisting}

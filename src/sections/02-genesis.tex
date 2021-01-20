@@ -1,3 +1,48 @@
 %%%%%%%%%%%%%%%%%%%%%%%
 \section{Genesis State}
 %%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Logic Diagram}
+
+\subsection{Workload in Findora Code}
+
+\subsection{Workload in Tenderimint Code}
+
+\begin{lstlisting}[language=go]
+    /**
+     * tendermint(v0.33.5)/state/state.go#131
+     */
+    func (state State) MakeBlock(
+        height int64,
+        txs []types.Tx,
+        commit *types.Commit,
+        evidence []types.Evidence,
+        proposerAddress []byte,
+    ) (*types.Block, *types.PartSet) {
+        block := types.MakeBlock(height, txs, commit, evidence)
+
+        var timestamp time.Time
+        if height == 1 {
+            // Right here!
+            // Write all transactions that need to be in the genesis block.
+            //
+            // ```
+            // txs = findora.GenesisTxs()
+            // block = types.MakeBlock(height, txs, commit, evidence)
+            // ```
+            timestamp = state.LastBlockTime
+        } else {
+            timestamp = MedianTime(commit, state.LastValidators)
+        }
+
+        block.Header.Populate(
+            state.Version.Consensus, state.ChainID,
+            timestamp, state.LastBlockID,
+            state.Validators.Hash(), state.NextValidators.Hash(),
+            state.ConsensusParams.Hash(), state.AppHash, state.LastResultsHash,
+            proposerAddress,
+        )
+
+        return block, block.MakePartSet(types.BlockPartSizeBytes)
+    }
+\end{lstlisting}

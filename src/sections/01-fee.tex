@@ -1,3 +1,50 @@
 %%%%%%%%%%%%%%%%%%%%%%%
 \section{Transaction Fee}
 %%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Logic Diagram}
+
+\subsection{Workload in Findora Code}
+
+\subsection{Workload in Tenderimint Code} \label{tendermint:CreateProposalBlock}
+
+\begin{lstlisting}[language=go]
+    /**
+     * tendermint(v0.33.5)/state/execution.go#92
+     */
+    func (blockExec *BlockExecutor) CreateProposalBlock(
+        height int64,
+        state State, commit *tGypes.Commit,
+        proposerAddr []byte,
+    ) (*types.Block, *types.PartSet) {
+        maxBytes := state.ConsensusParams.Block.MaxBytes
+        maxGas := state.ConsensusParams.Block.MaxGas
+
+        maxNumEvidence, _ := types.MaxEvidencePerBlock(maxBytes)
+        evidence := blockExec.evpool.PendingEvidence(maxNumEvidence)
+
+        maxDataBytes := types.MaxDataBytes(maxBytes, state.Validators.Size(), len(evidence))
+        txs := blockExec.mempool.ReapMaxBytesMaxGas(maxDataBytes, maxGas)
+
+        // Right here!
+        //
+        // Filter out transactions that want to steal fees,
+        // drop all txs with any input from the `PUB_ACCOUNT`.
+        //
+        // Should this be implemented in the ABCI's `CheckTx(...)`?
+        //
+        // ```
+        // txs = findora.FilterThieves(txs)
+        // ```
+        //
+        // After all txs from the mempool have been handled correctly,
+        // the validator can create a new tx which will transfer all fees
+        // from the `PUB_ACCOUNT` to its own, and append it to txs.
+        //
+        // ```
+        // txs = findora.AppendFeeTx(txs)
+        // ```
+
+        return state.MakeBlock(height, txs, commit, evidence, proposerAddr)
+    }
+\end{lstlisting}
