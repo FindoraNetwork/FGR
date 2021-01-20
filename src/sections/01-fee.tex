@@ -29,7 +29,7 @@
         // Right here!
         //
         // Filter out transactions that want to steal fees,
-        // drop all txs with any input from the `PUB_ACCOUNT`.
+        // drop all txs with any input from the `PUB ACCOUNT`.
         //
         // Should this be implemented in the ABCI's `CheckTx(...)`?
         //
@@ -39,7 +39,7 @@
         //
         // After all txs from the mempool have been handled correctly,
         // the validator can create a new tx which will transfer all fees
-        // from the `PUB_ACCOUNT` to its own, and append it to txs.
+        // from the `PUB ACCOUNT` to its own, and append it to txs.
         //
         // ```
         // txs = findora.AppendFeeTx(txs)
