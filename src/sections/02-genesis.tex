@@ -24,8 +24,7 @@ The transaction process in the genesis block is as follows:
     \item Create an FRA asset type with a fixed address\footnote {this address is similar to FFA and is also fully public}.
             This address will be referred to as FGA (Findora Genesis Address) in the following content
     \item Issue a large number of tokens, such as the maximum value of u64.
-    \item Create a transaction and transfer the pre-sold amount of tokens to FFA.
-    \item Create a transaction, send the corresponding amount of tokens from FFA to user.
+    \item Create a transaction, send the corresponding amount of tokens to those pre-registered address.
     \item These transactions will be obtained by the APP through the regular
             \LSTINLINE{DeliverTx} callback, so no additional data synchronization operations are required.
 \end{ENUMERATE}
