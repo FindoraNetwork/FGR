@@ -15,7 +15,7 @@ and all fees transferred to this address are regarded as transaction fees.
 
 In the following content, FFA (Findora Fee Address) will be used to represent this address.
 
-When the Validator generates a block, it can transfer all assets
+When the validator generates a block, it can transfer all assets
 under the FFA to its own account based on the FFA's private key as the block's revenue, usually FRA tokens.
 
 The calculation rule of transaction fee is another issue that needs to be considered,
@@ -29,21 +29,21 @@ The transaction fee collection logic will be implemented in this way.
 
 \begin{enumerate}
     \item In a fully public FFA account, anyone can construct a legal transaction signature.
-            How to ensure that the tokens are only obtained by the Validator?
+            How to ensure that the tokens are only obtained by the validator?
         \begin{itemize}
-            \item Analyzing from the economic model, Validator will certainly not allow the theft of its assets.
-            \item The block is packaged by the Validator. In the process of packaging,
+            \item Analyzing from the economic model, validator will certainly not allow the theft of its assets.
+            \item The block is packaged by the validator. In the process of packaging,
                     all records of transfers from the FFA account that are not issued by itself will be filtered out.
             \item The logic of this part will be implemented by changing the code of Tendermint.
         \end{itemize}
-    \item Does Validator have a chance to create double-spending phenomenon?
+    \item Does validator have a chance to create double-spending phenomenon?
         \begin{itemize}
             \item This needs to be controlled by the business logic of the APP, such as Nonce, etc.
             \item The transaction fee mechanism itself does not introduce additional double spending.
         \end{itemize}
 \end{enumerate}
 
-\subsection{Jobs in Findora}
+\subsection{Changes to Findora}
 
 \begin{itemize}
     \item Provide a function to the client to calculate transaction fees
@@ -73,7 +73,9 @@ The transaction fee collection logic will be implemented in this way.
     }
 \end{lstlisting}
 
-\subsection{Jobs in Tenderimint} \label{tendermint:CreateProposalBlock}
+\clearpage
+
+\subsection{Changes to Tenderimint} \label{tendermint:CreateProposalBlock}
 
 ~\par
 
