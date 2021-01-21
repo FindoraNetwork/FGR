@@ -10,12 +10,12 @@
 
 Whether it is by adding \LSTINLINE{AppState}\footnote{and then sending the transaction accordingly in the APP}
 in \LSTINLINE{genesis.json},
-Or the way of sending transactions directly on the client side, there is no absolute guarantee that all the preset
+or the way of sending transactions directly on the client side, there has no guarantee that all the preset
 transactions will be packaged into the genesis block\footnote{Tendermint's genesis block height is 1}.
-The reason is that all transactions sent from outside Tendermint need to go through its \LSTINLINE{MemPool},
-There are many uncertainties when the transactions in \LSTINLINE{MemPool} are packaged.
+The reason is that all transactions sent from outside need to go through tendermint's \LSTINLINE{MemPool},
+The time when these transactions in \LSTINLINE{MemPool} are confirmed\footnote{aka `packaged by validator'} cannot be accurately predicted.
 
-If you can add these preset transactions after \LSTINLINE{MemPool}, you can get a definite result,
+If we can add these preset transactions after \LSTINLINE{MemPool}, we will get a definite result,
 that is, all preset transactions will appear in the genesis block.
 
 The transaction process in the genesis block is as follows:
@@ -25,7 +25,7 @@ The transaction process in the genesis block is as follows:
             This address will be referred to as FGA (Findora Genesis Address) in the following content
     \item Issue a large number of tokens, such as the maximum value of u64.
     \item Create a transaction and transfer the pre-sold amount of tokens to FFA.
-    \item Create a transaction, send the corresponding amount of tokens from FFA to each user's address.
+    \item Create a transaction, send the corresponding amount of tokens from FFA to user.
     \item These transactions will be obtained by the APP through the regular
             \LSTINLINE{DeliverTx} callback, so no additional data synchronization operations are required.
 \end{ENUMERATE}
@@ -46,7 +46,7 @@ The transaction process in the genesis block is as follows:
     \item Why do I need to use FFA when transferring money to users?
     \begin{ITEMIZE}
         \item FGA will be restricted to only allow transfers to FFA in the logic of the APP layer.
-        \item This attribute will be used by the logic related to block rewards in the \ref{section:reward} chapter.
+        \item This attribute will also be used by the block rewards in the \ref{section:reward} chapter.
     \end{ITEMIZE}
 \end{ENUMERATE}
 

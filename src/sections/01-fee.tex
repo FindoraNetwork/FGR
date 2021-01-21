@@ -79,13 +79,13 @@ The transaction fee collection logic will be implemented in this way.
 
 ~\par
 
-Create a \LSTINLINE{golang package} similar to \LSTINLINE{github.com/FindoraNetwork/findora},
-The internal package \LSTINLINE{txn_builder}\footnote{ compiles Rust code into a static library,
-and Go calls the function through FFI},
-It is used to create a transaction for charging transaction fees
-when \LSTINLINE{Tendermint} generates a block.
+Create a \LSTINLINE{golang package} to create transactions for charging transaction fees
+when \LSTINLINE{Tendermint} generates a block. It will has an import-path similar to \LSTINLINE{github.com/FindoraNetwork/findora},
+wrapped the \LSTINLINE{txn_builder} inside it, specifically, we will compile rust code into a static library,
+and call it through golang FFI, if you do not familiar with this way,
+see \href{https://github.com/filecoin-project/filecoin-ffi}{filecoin-ffi}.
 
-The comment section in the following code segment describes the logic
+The comment section in the following codes describes the logic
 that will be added to \LSTINLINE{Tendermint}:
 
 \begin{lstlisting}[language=go]
@@ -117,9 +117,9 @@ that will be added to \LSTINLINE{Tendermint}:
         // txs = findora.FilterThieves(txs)
         // ```
         //
-        // After all txs from the mempool have been handled correctly,
+        // After all `txs` from the mempool have been handled correctly,
         // the validator can create a new tx which will transfer all fees
-        // from the `FFA` to its own, and append it to txs.
+        // from the `FFA` to its own, and append it to `txs`.
         //
         // ```
         // txs = findora.AppendFeeTx(txs)

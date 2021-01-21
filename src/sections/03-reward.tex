@@ -11,7 +11,7 @@
 All \LSTINLINE{Block Rewards} finally come from FGA.
 
 There can only be one transaction transferred from FGA in each block,
-and the amount cannot exceed the officially defined block reward,
+and the amount cannot exceed the officially defined block-reward,
 and its destination must be FFA.
 
 \subsection{Changes to Findora}
@@ -34,7 +34,7 @@ Ensure that the following rules are all effective:
 ~\par
 
 Recalling the \LSTINLINE{CreateProposalBlock()} function in Tendermint that we mentioned in \ref{tendermint:CreateProposalBlock},
-we can go a step further and add a special rule to it, as follows:
+we can go a step further, as follows:
 
 \begin{lstlisting}[language=go]
     /**
@@ -78,6 +78,10 @@ we can go a step further and add a special rule to it, as follows:
         // ```
         // txs = findora.AppendFeeAndRewards(txs)
         // ```
+        //
+        // Should the `AppendFeeAndRewards` be splitted to two separated functions?
+        //     - findora.AppendFee(txs)
+        //     - findora.AppendRewards(txs)
 
         return state.MakeBlock(height, txs, commit, evidence, proposerAddr)
     }
