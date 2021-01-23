@@ -1,0 +1,26 @@
+%%%%%%%%%%%%%%%%%%%%%%%
+\section{Investment Return}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Overview}
+
+~\par
+
+Some thoughts about the design of the return on investment:
+
+\begin{ITEMIZE}
+    \item We will assume that the token will increase in value over time, which is a natural benefit.
+    \item During mainnet v1.0, all validators may be operated internally, but this does not mean that the income
+        receiving address of the code validator must also be internal. It can be the address of the investor,
+        and a single validator can have multiple such addresses. The weight of each address is allocated based
+        on the investment amount. In general, validator can perform the role of a revenue distribution agent.
+    \item When issuing FRAs, we issue such an investment incentive strategy:
+        at a predetermined block height, we will add up all the transaction fees before this
+        (maybe use other better algorithms instead of simple addition), Issuance of the same amount
+        of tokens as investment income. The method of distribution is: the weight is calculated according
+        to the FRA holding time of all investors and the holding amount at that time,
+        and the final return that each investor will get is determined according to this weight.
+        The principle of this model is: the more transactions, the better the operating status of Findora,
+        and the better the operating status of Findora, the greater the expected return of investors,
+        which in turn will give investors the motivation to do more things that benefit Findora.
+\end{ITEMIZE}
